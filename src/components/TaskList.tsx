@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, MenuItem, Select, TextField, Typography } from '@mui/material';
 
 
-const myInitialList: Task[] = [
+/*const myInitialList: Task[] = [
   { id: 0, title: 'Botar la basura', completed: false },
   { id: 1, title: 'Task 2', completed: false },
   { id: 2, title: 'Task 3', completed: false },
@@ -24,20 +24,22 @@ const myInitialList: Task[] = [
   { id: 5, title: 'Task 6', completed: false },
   { id: 6, title: 'Task 7', completed: false },
   { id: 7, title: 'Task 8', completed: false },
-];
+];*/
 
 
 export function TaskList() {
-  const [myList, setMyList] = React.useState<Task[]>(myInitialList);
+  const [myList, setMyList] = React.useState<Task[]>([]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [submitted, setSubmitted] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [newTitle, setNewTitle] = React.useState('');
   const [itemsPerPage, setItemsPerPage] = React.useState(2);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = myList.slice(indexOfFirstItem, indexOfLastItem);
+  //let indexOfLastItem = currentPage * itemsPerPage;
+  //let indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  const [currentItems, setCurrentItems] = React.useState<Task[]>([]);
+  //let currentItems = myList.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     const taskService = new TaskService();
@@ -49,11 +51,22 @@ export function TaskList() {
         console.error('Error fetching tasks:', error);
       }
     };
-    //fetchTasks();
+    fetchTasks();
   }, []);
 
+  useEffect(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = myList.slice(indexOfFirstItem, indexOfLastItem);
+    setCurrentItems(currentItems);
+  }, [myList, currentPage, itemsPerPage]);
+
   const handleItemsPerPageChange = (value: number) => {
+    setCurrentPage(1);
     setItemsPerPage(value);
+  //   indexOfLastItem = currentPage * itemsPerPage;
+  // indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // setCurrentItems( myList.slice(indexOfFirstItem, indexOfLastItem));
   };
 
   const handleAdd = () => {
@@ -71,7 +84,7 @@ export function TaskList() {
     if (newTitle === '') {
       return;
     }
-    const newTask = { id: myList.length, title: newTitle, completed: false };
+    const newTask = { id: myList.length+1, title: newTitle, completed: false };
     setMyList([...myList, newTask]);
     handleClose();
   };

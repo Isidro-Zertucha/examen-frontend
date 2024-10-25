@@ -12,11 +12,11 @@ import { Task } from '../interfaces/task';
 import Pagination from '@mui/material/Pagination';
 import TaskService from '../services/taskService';
 import { useEffect } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, MenuItem, Select, TextField, Typography } from '@mui/material';
 
 
 const myInitialList: Task[] = [
-  { id: 0, title: 'Botar la basura basura basura basura', completed: false },
+  { id: 0, title: 'Botar la basura', completed: false },
   { id: 1, title: 'Task 2', completed: false },
   { id: 2, title: 'Task 3', completed: false },
   { id: 3, title: 'Task 4', completed: false },
@@ -26,7 +26,6 @@ const myInitialList: Task[] = [
   { id: 7, title: 'Task 8', completed: false },
 ];
 
-const ITEMS_PER_PAGE = 2;
 
 export function TaskList() {
   const [myList, setMyList] = React.useState<Task[]>(myInitialList);
@@ -34,7 +33,11 @@ export function TaskList() {
   const [submitted, setSubmitted] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [newTitle, setNewTitle] = React.useState('');
+  const [itemsPerPage, setItemsPerPage] = React.useState(2);
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = myList.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     const taskService = new TaskService();
@@ -46,8 +49,12 @@ export function TaskList() {
         console.error('Error fetching tasks:', error);
       }
     };
-    fetchTasks();
+    //fetchTasks();
   }, []);
+
+  const handleItemsPerPageChange = (value: number) => {
+    setItemsPerPage(value);
+  };
 
   const handleAdd = () => {
     setOpen(true);
@@ -85,12 +92,6 @@ export function TaskList() {
     setCurrentPage(page);
   };
 
-  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
-  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
-  const currentItems = myList.slice(indexOfFirstItem, indexOfLastItem);
-
-
-
   return (
     <>
       <Dialog open={open} onClose={handleClose}>
@@ -124,52 +125,70 @@ export function TaskList() {
 
       <Box display="flex" justifyContent={'space-between'} sx={{ paddingX: 2 }}>
         <Typography variant="h6">Pending Tasks</Typography>
-        <IconButton edge="end" aria-label="delete">
-          <AddIcon onClick={handleAdd} />
+        <IconButton edge="end" aria-label="delete" onClick={handleAdd} >
+          <AddIcon />
         </IconButton>
       </Box>
-      <Box display="flex"  >
 
-        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+      <Divider />
 
-          {currentItems.map((task) => {
-            const labelId = `checkbox-list-label-${task}`;
-            return (
-              <ListItem
-                key={task.id}
-                secondaryAction={
-                  <IconButton edge="end" aria-label="delete">
-                    <DeleteIcon onClick={handleDelete(task.id)} />
-                  </IconButton>
-                }
-                disablePadding
-              >
-                <ListItemButton role={undefined} onClick={handleToggle(task.id)} dense>
-                  <ListItemIcon>
-                    <Checkbox
-                      edge="start"
-                      checked={task.completed}
-                      tabIndex={-1}
-                      disableRipple
-                      inputProps={{ 'aria-labelledby': labelId }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText id={labelId} primary={task.title} sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }} />
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
-      </Box>
+      <List sx={{ width: { xs: '100%', md: 800 }, bgcolor: 'background.paper' }}>
 
+        {currentItems.map((task) => {
+          const labelId = `checkbox-list-label-${task}`;
+          return (
+            <ListItem
+              key={task.id}
+              secondaryAction={
+                <IconButton edge="end" aria-label="delete" onClick={handleDelete(task.id)} >
+                  <DeleteIcon />
+                </IconButton>
+              }
+              disablePadding
+            >
+              <ListItemButton role={undefined} onClick={handleToggle(task.id)} dense>
+                <ListItemIcon>
+                  <Checkbox
+                    edge="start"
+                    checked={task.completed}
+                    tabIndex={-1}
+                    disableRipple
+                    inputProps={{ 'aria-labelledby': labelId }}
+                  />
+                </ListItemIcon>
+                <ListItemText id={labelId} primary={task.title} sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
+      </List>
+
+      <Box sx={{ width: '100%', bgcolor: 'background.paper', display: 'flex', justifyContent: 'center' }} >
+      <Select
+        value={itemsPerPage}
+        onChange={(event) => handleItemsPerPageChange(event.target.value as number)}
+        sx={{
+          width: 64,
+          height: 32,
+          borderRadius: 10, // Change this value to adjust the border radius
+          '& .MuiSelect-select': {
+            borderRadius: 10, // Also apply the border radius to the select element
+          },
+        }}
+        >
+        <MenuItem value={2}>2</MenuItem>
+        <MenuItem value={5}>5</MenuItem>
+        <MenuItem value={10}>10</MenuItem>
+      </Select>
       <Pagination
-        count={Math.ceil(myList.length / ITEMS_PER_PAGE)}
+        count={Math.ceil(myList.length / itemsPerPage)}
         page={currentPage}
         onChange={(_event, page) => handlePageChange(page)}
         showFirstButton
         showLastButton
-        sx={{ width: '100%', bgcolor: 'background.paper', display: 'flex', justifyContent: 'center' }}
-      />
+        
+        />
+        </Box>
 
     </>
   );

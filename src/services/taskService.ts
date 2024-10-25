@@ -1,7 +1,7 @@
 import { Task } from "../interfaces/task";
 
 class TaskService {
-    private apiUrl = 'https://mpce87c1906c42d8e639.free.beeceptor.com/';
+    private apiUrl = 'http://localhost:3000/todos';
   
     async getTasks(): Promise<Task[]> {
       try {

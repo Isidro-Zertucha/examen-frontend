@@ -18,7 +18,10 @@ export const TaskList: React.FC = () => {
   const [submitted, setSubmitted] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [newTitle, setNewTitle] = React.useState('');
-  const [itemsPerPage, setItemsPerPage] = React.useState(2);
+  const [itemsPerPage, setItemsPerPage] = React.useState<number>(() => {
+    const storedItemsPerPage = localStorage.getItem('itemsPerPage');
+    return storedItemsPerPage ? parseInt(storedItemsPerPage, 10) : 2;
+  });
   const [currentItems, setCurrentItems] = React.useState<Task[]>([]);
 
   useEffect(() => {
@@ -35,6 +38,10 @@ export const TaskList: React.FC = () => {
       fetchTasks();
     }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('itemsPerPage', itemsPerPage.toString());
+  }, [itemsPerPage]);
 
   useEffect(() => {
     localStorage.setItem('myList', JSON.stringify(myList));

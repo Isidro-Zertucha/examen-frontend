@@ -1,7 +1,7 @@
 import { Task } from "../interfaces/task";
 
 class TaskService {
-    private apiUrl = 'http://localhost:3000/todos';
+    private apiUrl = 'http://localhost:3000/tasks';
   
     async getTasks(): Promise<Task[]> {
       try {

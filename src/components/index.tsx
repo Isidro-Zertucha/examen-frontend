@@ -1,3 +1,4 @@
-export * from './AddTaskForm';
-export * from './TaskItem';
-export * from './TaskList';
+export { AddTaskForm } from './AddTaskForm';
+export { Footer } from './Footer';
+export { TaskItem } from './TaskItem';
+export { TaskList } from './TaskList';

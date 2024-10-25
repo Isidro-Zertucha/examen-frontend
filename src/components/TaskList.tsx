@@ -10,7 +10,10 @@ import { AddTaskForm, Footer, TaskItem } from '.';
 
 
 export const TaskList: React.FC = () => {
-  const [myList, setMyList] = React.useState<Task[]>([]);
+  const [myList, setMyList] = React.useState<Task[]>(() => {
+    const storedList = localStorage.getItem('myList');
+    return storedList ? JSON.parse(storedList) : [];
+  });
   const [currentPage, setCurrentPage] = React.useState(1);
   const [submitted, setSubmitted] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -28,8 +31,14 @@ export const TaskList: React.FC = () => {
         console.error('Error fetching tasks:', error);
       }
     };
-    fetchTasks();
+    if (myList.length === 0) {
+      fetchTasks();
+    }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('myList', JSON.stringify(myList));
+  }, [myList]);
 
   useEffect(() => {
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -64,11 +73,10 @@ export const TaskList: React.FC = () => {
   };
 
   const handleToggle = (value: number) => {
-    console.log(value)
     const updatedMyList = myList.map((task) =>
       task.id === value ? { ...task, completed: !task.completed } : task
     );
-    setMyList(updatedMyList);
+    setMyList(updatedMyList);    
   };
 
   const handleDelete = (value: number) => {
